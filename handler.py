@@ -62,9 +62,9 @@ class ToolCallReviewer(InterventionHandler):
         has_steps = answers["has_steps"]["noul"]
         data_loss = answers["data_loss"]["noul"]
 
-        print("[intervention] classifications (probability of 'yes'):")
-        print(f"    has_steps  : {has_steps:.2f}")
-        print(f"    data_loss      : {data_loss:.2f}")
+        print("----Probabilities----")
+        print(f"has_steps: {has_steps:.2f}")
+        print(f"data_loss: {data_loss:.2f}")
 
         if data_loss >= RISK:
             prompt = "Critical Bug. Escale to a human (y/n):"
