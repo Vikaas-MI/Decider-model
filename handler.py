@@ -106,8 +106,6 @@ SYSTEM_PROMPT = (
     "given, just assume it is a less critical bug and call the tool with team='RD'."
 )
 
-USER_REQUEST = "I cannot login"
-
 
 def main() -> int:
     decider = Decider()
@@ -116,6 +114,8 @@ def main() -> int:
     except ServerUnavailable as exc:
         print(exc)
         return 1
+
+    USER_REQUEST = input ("Enter Bug: ")
 
     gate = ToolCallReviewer(decider)
     agent = Agent(
