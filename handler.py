@@ -15,13 +15,13 @@ QUESTIONS = {
         },
     ),
     "data_loss": Decider.noul(
-        "Does the report mention data loss or a security problem?",
+        "Does the report indicate that user data may have been lost, deleted, or become missing?",
         {
-            "true": "data is lost, exposed, or accessible to the wrong person",
-            "false": "no data loss or security concern is mentioned",
+            "true": "The report states or strongly indicates missing, deleted, or lost user data",
+            "false": "The report does not indicate missing, deleted, or lost user data",
         },
-    )
-}
+    ),
+    }
 
 STEPS = 0.5
 RISK = 0.7
@@ -66,17 +66,28 @@ class ToolCallReviewer(InterventionHandler):
         print(f"    has_steps  : {has_steps:.2f}")
         print(f"    data_loss      : {data_loss:.2f}")
 
-        if has_steps < STEPS:
+        if data_loss >= RISK:
+            prompt = "Critical Bug. Escale to a human (y/n):"
+            user_response = input(prompt).strip().lower()
+
+            if user_response in ("y", "yes"):
+                verdict = "approved"
+            elif user_response in ("n", "no"):
+                verdict = "rejected"
+            else:
+                print("Invalid response. Please enter y or n.")
+                verdict = "rejected"           
+
+            action = Confirm(
+                prompt= prompt,
+                response= user_response
+            )
+
+        elif has_steps < STEPS:
             verdict, action = "guided", Guide(
                 feedback=(
                     "The report has no reproduction steps. Ask the reporter for the "
                     "steps, then try again."
-                )
-            )
-        elif data_loss >= RISK:
-            verdict, action = "confirmed", Confirm(
-                prompt=(
-                    "Critical bug or possible data loss. Escalate to a human?"
                 )
             )
         else:
@@ -123,7 +134,7 @@ def main() -> int:
         tools=[assign_bug],
         interventions=[gate],
         system_prompt=SYSTEM_PROMPT,
-        callback_handler=None,  # the gate's own log is the interesting output
+        callback_handler=None, 
     )
 
     print(f"the agent proposes each tool call; {NAME} decides whether it is ready to run\n")
