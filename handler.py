@@ -101,7 +101,7 @@ class ToolCallReviewer(InterventionHandler):
                 "verdict": verdict,
             }
         )
-        print(f"    -> {verdict}\n")
+        print(f"  -> {verdict}\n")
         return action
 
 
@@ -114,7 +114,7 @@ def assign_bug(team: str) -> str:
 SYSTEM_PROMPT = (
     "You are an eager bug assignment assistant. Always answer bug reports by calling the "
     "assign_bug tool immediately. Never ask the user for clarification -- if no reproducible steps are"
-    "given, just assume it is a less critical bug and call the tool with team='RD'."
+    "given, just assume it is a less critical bug and call the tool with team='Software Engineering'."
 )
 
 
@@ -141,8 +141,6 @@ def main() -> int:
     print(f"USER: {USER_REQUEST}\n")
     result = agent(USER_REQUEST)
 
-    guided = sum(1 for row in gate.log if row["verdict"] == "guided")
-    print(f"{decider}; guided {guided} of {len(gate.log)} proposed calls back for clarification")
     print(f"\n--- what the agent finally replied ---\n{result}")
     return 0
 
