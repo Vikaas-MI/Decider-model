@@ -4,7 +4,7 @@ import json
 import sys
 from client import NAME, Decider, ServerUnavailable
 from strands import Agent, tool
-from strands.interventions import Guide, InterventionHandler, Proceed, Confirm
+from strands.interventions import Guide, InterventionHandler, Proceed, Confirm, Deny
 
 QUESTIONS = {
     "has_steps": Decider.noul(
@@ -71,17 +71,18 @@ class ToolCallReviewer(InterventionHandler):
             user_response = input(prompt).strip().lower()
 
             if user_response in ("y", "yes"):
-                verdict = "approved"
+                verdict = "Approved"
+                action = Proceed()
             elif user_response in ("n", "no"):
-                verdict = "rejected"
+                verdict = "Rejected"
+                action = Deny(reason="Human rejected the critical bug assignment.")
             else:
                 print("Invalid response. Please enter y or n.")
-                verdict = "rejected"           
+                verdict = "Rejected" 
+                action = Deny(reason="Human rejected the critical bug assignment.")          
 
-            action = Confirm(
-                prompt= prompt,
-                response= user_response
-            )
+            print(f"{verdict}\n")
+            return action
 
         elif has_steps < STEPS:
             verdict, action = "guided", Guide(
@@ -91,7 +92,7 @@ class ToolCallReviewer(InterventionHandler):
                 )
             )
         else:
-            verdict, action = "proceeded", Proceed()
+            verdict, action = "Proceeded", Proceed()
 
         self.log.append(
             {
@@ -101,13 +102,14 @@ class ToolCallReviewer(InterventionHandler):
                 "verdict": verdict,
             }
         )
-        print(f"  -> {verdict}\n")
+        print(f"{verdict}\n")
         return action
 
 
 @tool
 def assign_bug(team: str) -> str:
     """Assign a bug report to a development team."""
+    print("Bug Assigning tool called...")
     return f"Bug assigned to {team}"
 
 
@@ -137,11 +139,10 @@ def main() -> int:
         callback_handler=None, 
     )
 
-    print(f"the agent proposes each tool call; {NAME} decides whether it is ready to run\n")
-    print(f"USER: {USER_REQUEST}\n")
-    result = agent(USER_REQUEST)
+    print(f"\nUSER: {USER_REQUEST}\n")
+    result=agent(USER_REQUEST)
 
-    print(f"\n--- what the agent finally replied ---\n{result}")
+    print(f"AGENT: {result}\n")
     return 0
 
 
