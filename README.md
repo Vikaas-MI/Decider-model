@@ -103,13 +103,3 @@ Type a bug report when prompted.
 
 The terminal prints the decider's probabilities (`has_steps`, `data_loss`) and the verdict for each tool call.
 
-## Troubleshooting
-
-- **`Decision server unavailable`:** the server from step 5 is not running, or its port does not match `SERVER_URL` in `client.py`.
-- **AWS or Bedrock errors:** check your credentials, your region, and that your account has access to the Claude model named in `handler.py`.
-- **`strands-decider: command not found`:** activate the virtual environment in that terminal first.
-- **Server flags differ:** run `strands-decider serve --help` to check the options for your installed version.
-
-## Credits
-
-Built on [Strands Decider](https://github.com/strands-labs/strands-decider) and [Strands Agents](https://strandsagents.com).
