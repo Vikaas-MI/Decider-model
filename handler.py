@@ -128,22 +128,27 @@ def main() -> int:
         print(exc)
         return 1
 
-    USER_REQUEST = input ("Enter Bug: ")
+    while True:
+        USER_REQUEST = input ("Enter Bug: ")
 
-    gate = ToolCallReviewer(decider)
-    agent = Agent(
-        model="us.anthropic.claude-haiku-4-5-20251001-v1:0",
-        tools=[assign_bug],
-        interventions=[gate],
-        system_prompt=SYSTEM_PROMPT,
-        callback_handler=None, 
-    )
+        if USER_REQUEST != "exit":
+            gate = ToolCallReviewer(decider)
+            agent = Agent(
+                model="us.anthropic.claude-haiku-4-5-20251001-v1:0",
+                tools=[assign_bug],
+                interventions=[gate],
+                system_prompt=SYSTEM_PROMPT,
+                callback_handler=None, 
+            )
 
-    print(f"\nUSER: {USER_REQUEST}\n")
-    result=agent(USER_REQUEST)
+            print(f"\nUSER: {USER_REQUEST}\n")
+            result=agent(USER_REQUEST)
 
-    print(f"AGENT: {result}\n")
+            print(f"AGENT: {result}\n")
+        else:
+            break
     return 0
+
 
 
 if __name__ == "__main__":
